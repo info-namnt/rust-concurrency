@@ -2,6 +2,8 @@
 ## Command
 ```cargo run --example <exm>```
 ## Note
+
+### I. Sử dụng Thread để xử lý đồng thời
 ---
 1. Thư viện tiêu chuẩn Rust sử dụng mô hình triển khai luồng 1: 1, là một chương trình sử dụng một luồng hệ điều hành trên một luồng ngôn ngữ.
 ---
@@ -20,3 +22,6 @@
 5. sử dụng từ khóa `move` với các `closures` được truyền vào trong `thread :: spawn()`. Khi đó, `closures` sẽ có quyền sở hữu các giá trị mà nó sử dụng từ môi trường, do đó chuyển quyền sở hữu các giá trị đó từ một thread này sang một thread khác.
 
    ```cargo run --example exm04```
+
+### II. Sử dụng Message Passing để chuyền Data giữa các Threads
+6. `Channel` là một khái niệm lập trình chung mà dữ liệu được gửi từ luồng này sang luồng khác. Một Channel có hai nửa: kênh phát và kênh nhận
