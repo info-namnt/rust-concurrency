@@ -1,4 +1,4 @@
-# Lập trình Concurrency với Rust
+# Rust Concurrency Programing
 ## Command
 
     cargo run --example <exm>
