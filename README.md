@@ -38,7 +38,64 @@ sử dụng từ khóa `move` với các `closures` được truyền vào trong
 
 ### II. Sử dụng Message Passing để chuyền Data giữa các Threads
 ---
+
 `Channel` là một khái niệm lập trình chung mà dữ liệu được gửi từ luồng này sang luồng khác. Một Channel có hai phần: kênh phát và kênh nhận.Cách thư viện tiêu chuẩn của Rust triển khai các channels là một channel có thể có nhiều đầu gửi tạo ra các giá trị nhưng chỉ một đầu nhận sử dụng các giá trị đó. 
 Ví dụ: Khi truyền tx vào trong `closures` thread:spawn và `send()`, là ta đang thực hiện việc `spawned thread` trao đổi thông tin với `main thread`. Điều này giống như đưa một con vịt cao su lên thượng nguồn sông hoặc gửi một tin nhắn trò chuyện từ chủ đề này sang chủ đề khác.
 
     cargo run --example exm05
+
+---
+
+Chúng ta cũng có thể `send` nhiều giá trị một lúc
+
+    cargo run --example exm06
+
+Ở kênh gửi, khi chúng ta gửi lần lượt các thông điệp
+Ở kênh nhận, chúng ta có thể nhận các thông điệp thông qua 1 vòng lặp
+
+Ta có thể thấy chúng ta không có bất kỳ dòng code nào cho việc `pause` hoặc `delay` main thread, điều đó có nghĩa `main thread` đang đợi để nhận các thông điệp từ `spawn thread`
+
+---
+
+Nhân bản kênh gửi bằng cách sử dụng `clone`
+Trước khi gọi `thread:spawn` chúng ta nhân bản kênh gửi `tx` → `tx1`
+Chúng ta chuyển kênh gửi `tx1` cho một `thread` thứ 2. Điều này cung cấp cho chúng ta 2 `thread`, mỗi `thread` sẽ gửi các thông điệp khác nhau đến kênh nhận `rx`.
+
+    cargo run --example exm07
+
+### III. Share state concurrency
+
+---
+
+Sử dụng Mutexes để cho phép truy cập vào dữ liệu từ một thread tại một thời điểm. 
+
+Mutexes có tiếng là khó sử dụng vì bạn phải nhớ hai quy tắc:
+
+- Bạn phải được mở khóa để lấy được dữ liệu 
+- Khi bạn sử dụng xong dữ liệu, bạn phải mở khóa để các luồng khác có thể truy cập 
+
+---
+
+Sử dụng Mutex trong đơn luồng 
+
+    cargo run --example exm08
+
+Với nhiều kiểu dữ liệu khác nhau, đều có thể sử dụng `Mutex<T>` kèm với phương thức `new()` để tạo ra 1 Mutex
+
+Để truy cập được Data trong Mutex phải dùng hàm `lock()`. 
+Nếu như có 1 thread đang giữ khóa này, hàm `lock()` sẽ trả về `panic`.
+Có thể nói `Mutex<T>` là 1 `smart pointer`.
+
+---
+
+Để chia sẻ `Mutex` với nhiều threads khác nhau, Rust sẽ thông báo về việc không thể thay đổi các ownership giữa các thread.
+
+Vì vậy chúng ta cần sử dụng 1 thứ gì đó giống như `Referrence Counter Smart Pointer` để chia sẻ ownership. 
+
+Tuy nhiên `Rc<T>` không giúp ích gì trong trường hợp này vì `Rc<T>` không an toàn khi chia sẻ giữa các threads 
+
+Ở đây chúng ta sẽ đề cập đến `Atomic Referrence Counter` _ Arc<T> 
+(Sẽ có đánh đổi về hiệu suất, nên chỉ thực hiện khi bạn thực sự cần)
+
+
+    cargo run --example exm09
